@@ -45,18 +45,18 @@ resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
   policy_arn = aws_iam_policy.iam_policy_for_lambda.arn
 }
 
-data "archive_file" "zipped_python_code" {
+data "archive_file" "zipped_go_code" {
   type        = "zip"
   source_dir  = "${path.module}/api/"
-  output_path = "${path.module}/api/hello-python.zip"
+  output_path = "${path.module}/api/main.zip"
 }
 
 resource "aws_lambda_function" "terraform_lambda_func" {
-  filename         = "${path.module}/api/hello-python.zip"
-  source_code_hash = filebase64sha256("${path.module}/api/hello-python.zip")
+  filename         = "${path.module}/api/main.zip"
+  source_code_hash = filebase64sha256("${path.module}/api/main.zip")
   function_name    = "SimSafari_Lodge_Booking_API"
   role             = aws_iam_role.iam_for_lambda.arn
-  handler          = "hello-python.lambda_handler"
-  runtime          = "python3.9"
+  handler          = "main"
+  runtime          = "go1.x"
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
