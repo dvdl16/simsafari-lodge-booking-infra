@@ -73,3 +73,16 @@ resource "aws_lambda_function" "terraform_lambda_func" {
   runtime          = "go1.x"
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
+
+# Database
+resource "aws_dynamodb_table" "tf_bookings_table" {
+  name           = "tf-bookings-table"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = "5"
+  write_capacity = "5"
+  attribute {
+    name = "bookingId"
+    type = "S"
+  }
+  hash_key = "bookingId"
+}
