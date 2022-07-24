@@ -36,3 +36,7 @@ To manually deploy the latest version to Lambda:
 ```bash
 aws lambda update-function-code --function-name SimSafari_Lodge_Booking_API --zip-file fileb://main.zip --profile jabulani
 ```
+
+### Other Notes
+
+`go mod tidy` was used. It ensures that the go.mod file matches the source code in the module. It adds any missing module requirements necessary to build the current module’s packages and dependencies, and it removes requirements on modules that don’t provide any relevant packages. It also adds any missing entries to go.sum and removes unnecessary entries (credit to [S.D.](https://stackoverflow.com/a/68001204))
