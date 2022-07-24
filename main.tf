@@ -51,9 +51,33 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
   })
 }
 
+resource "aws_iam_policy" "iam_dynamodb_privilege_policy" {
+  name        = "aws_iam_dynamodb_privilege_policy"
+  path        = "/"
+  description = "AWS IAM Policy for GetItem and PutItem privileges on DynamoDB "
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem"
+        ],
+        "Resource" : "*",
+        "Effect" : "Allow"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = aws_iam_policy.iam_policy_for_lambda.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_iam_dynamodb_privilege_policy_to_iam_role" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.iam_dynamodb_privilege_policy.arn
 }
 
 # Data
