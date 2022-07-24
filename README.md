@@ -20,8 +20,6 @@ terraform plan -var-file="test_env.tfvars"
 terraform apply -var-file="test_env.tfvars"
 ```
 
-This will compile the Go binaries and deploy these to the Lambda function.
-
 *Note that terraform expects a AWS CLI profile named `jabulani`.
 
 ### Building the Go backend locally
