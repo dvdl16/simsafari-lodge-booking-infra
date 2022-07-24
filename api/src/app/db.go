@@ -48,3 +48,33 @@ func getItem(bookingId string) (*booking, error) {
 
 	return bk, nil
 }
+
+// Add a booking record to DynamoDB.
+func putItem(bk *booking) error {
+	input := &dynamodb.PutItemInput{
+		TableName: aws.String("tf-bookings-table"),
+		Item: map[string]*dynamodb.AttributeValue{
+			"bookingId": {
+				S: aws.String(bk.BookingId),
+			},
+			"userId": {
+				S: aws.String(bk.UserId),
+			},
+			// "fromDate": {
+			// 	N: aws.Int(bk.FromDate),
+			// },
+			// "toDate": {
+			// 	N: aws.Int(bk.ToDate),
+			// },
+			// "houses": {
+			//     SS: aws.StringSet(bk.Houses),
+			// },
+			"guestDetails": {
+				S: aws.String(bk.GuestDetails),
+			},
+		},
+	}
+
+	_, err := db.PutItem(input)
+	return err
+}
