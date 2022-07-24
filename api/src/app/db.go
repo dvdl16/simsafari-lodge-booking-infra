@@ -19,7 +19,7 @@ func getItem(bookingId string) (*booking, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String("tf-bookings-table"),
 		Key: map[string]*dynamodb.AttributeValue{
-			"BookingId": {
+			"bookingId": {
 				S: aws.String(bookingId),
 			},
 		},
