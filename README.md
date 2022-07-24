@@ -20,7 +20,6 @@ terraform apply
 These are the commands to build, run from `simsafari-lodge-booking-infra/api`:
 
 ```bash
-env GOOS=linux GOARCH=amd64 go build src/app/main.go
 env GOOS=linux GOARCH=amd64 go build src/app/*.go
 
 ```
