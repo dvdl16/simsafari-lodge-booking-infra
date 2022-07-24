@@ -7,10 +7,17 @@ This repository contains source code for managing the infrastructure and backend
 - The backend a serverless API with Go and AWS Lambda
 
 ### Deploying the infrastructure
-Use the following terraform commands:
+Make sure to have a `.tfvars` file or to supply the following terraform variables:
 ```bash
-terraform plan
-terraform apply
+aws_provider_profile_name
+aws_region
+```
+
+
+To deploying the infrastructure, use the following terraform commands:
+```bash
+terraform plan -var-file="test_env.tfvars"
+terraform apply -var-file="test_env.tfvars"
 ```
 
 This will compile the Go binaries and deploy these to the Lambda function.
