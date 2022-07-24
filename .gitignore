@@ -58,3 +58,7 @@ terraform.rc
 
 # Zipped Lambda code
 *.zip
+
+# Compiled binaries
+db
+main
