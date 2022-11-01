@@ -98,6 +98,11 @@ resource "aws_lambda_function" "terraform_lambda_func" {
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
 
+resource "aws_lambda_function_url" "terraform_lambda_func_url_latest" {
+  function_name      = aws_lambda_function.terraform_lambda_func.function_name
+  authorization_type = "NONE"
+}
+
 # Database
 resource "aws_dynamodb_table" "tf_bookings_table" {
   name           = "tf-bookings-table"
