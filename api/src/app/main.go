@@ -14,19 +14,22 @@ import (
 
 var uuidRegexp = regexp.MustCompile(`^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$`)
 var errorLogger = log.New(os.Stderr, "ERROR ", log.Llongfile)
+var debugLogger = log.New(os.Stderr, "DEBUG ", log.Llongfile)
 
 type booking struct {
 	BookingId    string   `json:"bookingId"`
 	UserId       string   `json:"userId"`
-	FromDate     int      `json:"fromDate"`
-	ToDate       int      `json:"toDate"`
+	FromDate     string   `json:"fromDate"`
+	ToDate       string   `json:"toDate"`
 	Houses       []string `json:"houses` // Type SS (String Set) in DynamoDB
 	GuestDetails string   `json:"guestDetails"`
 }
 
 // Do a switch on the HTTP request method to determine which action to take.
-func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	switch req.HTTPMethod {
+func router(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
+	debugLogger.Println("req.RequestContext.HTTP.Method:")
+	debugLogger.Println(req.RequestContext.HTTP.Method)
+	switch req.RequestContext.HTTP.Method {
 	case "GET":
 		return show(req)
 	case "POST":
@@ -36,7 +39,7 @@ func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	}
 }
 
-func show(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func show(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
 	// Get the `bookingId` query string parameter from the request and
 	// validate it.
 	bookingId := req.QueryStringParameters["bookingId"]
@@ -68,7 +71,7 @@ func show(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, er
 	}, nil
 }
 
-func create(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func create(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
 	if req.Headers["content-type"] != "application/json" && req.Headers["Content-Type"] != "application/json" {
 		return clientError(http.StatusNotAcceptable, "Malformed or incorrect headers")
 	}
@@ -76,6 +79,8 @@ func create(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	bk := new(booking)
 	err := json.Unmarshal([]byte(req.Body), bk)
 	if err != nil {
+		errorLogger.Println("Request has invalid format:")
+		errorLogger.Println(err)
 		return clientError(http.StatusUnprocessableEntity, "Invalid object format")
 	}
 
