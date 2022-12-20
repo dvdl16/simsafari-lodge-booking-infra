@@ -34,10 +34,9 @@ type user struct {
 	OTP          string `json:"otp"`
 	ThirdParty   string `json:"thirdParty"`
 }
+
 // Do a switch on the HTTP request method to determine which action to take.
 func router(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
-	debugLogger.Println("req.RequestContext.HTTP.Method:")
-	debugLogger.Println(req.RequestContext.HTTP.Method)
 	switch req.RequestContext.HTTP.Method {
 	case "GET":
 		return show(req)
@@ -111,7 +110,7 @@ func create(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse,
 	if !uuidRegexp.MatchString(bk.BookingId) {
 		return clientError(http.StatusBadRequest, "Invalid booking ID")
 	}
-	if bk.GuestDetails == "" || bk.GuestDetails == "" {
+	if bk.GuestDetails == "" {
 		return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
 	}
 
