@@ -25,6 +25,15 @@ type booking struct {
 	GuestDetails string   `json:"guestDetails"`
 }
 
+type user struct {
+	UserId       string `json:"userId"`
+	Name         string `json:"name"`
+	Phone        string `json:"phone"`
+	Email        string `json:"email"`
+	LastLoggedIn string `json:"lastLoggedIn"`
+	OTP          string `json:"otp"`
+	ThirdParty   string `json:"thirdParty"`
+}
 // Do a switch on the HTTP request method to determine which action to take.
 func router(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
 	debugLogger.Println("req.RequestContext.HTTP.Method:")
@@ -106,7 +115,7 @@ func create(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse,
 		return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
 	}
 
-	err = putItem(bk)
+	err = putBooking(bk)
 	if err != nil {
 		return serverError(err)
 	}

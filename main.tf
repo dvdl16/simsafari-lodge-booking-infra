@@ -104,7 +104,7 @@ resource "aws_lambda_function_url" "terraform_lambda_func_url_latest" {
   authorization_type = "NONE"
 }
 
-# Database
+# Database table for bookings
 resource "aws_dynamodb_table" "tf_bookings_table" {
   name           = "tf-bookings-table"
   billing_mode   = "PROVISIONED"
@@ -115,6 +115,19 @@ resource "aws_dynamodb_table" "tf_bookings_table" {
     type = "S"
   }
   hash_key = "bookingId"
+}
+
+# Database table for users
+resource "aws_dynamodb_table" "tf_users_table" {
+  name           = "tf-users-table"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = "5"
+  write_capacity = "5"
+  attribute {
+    name = "userId"
+    type = "S"
+  }
+  hash_key = "userId"
 }
 
 # API Gateway

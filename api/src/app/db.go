@@ -57,7 +57,7 @@ func getBookings(minFromDate string) (*[]booking, error) {
 }
 
 // Add a booking record to DynamoDB.
-func putItem(bk *booking) error {
+func putBooking(bk *booking) error {
 	var houses []*string
 	for _, i := range bk.Houses {
 		houses = append(houses, aws.String(i))
