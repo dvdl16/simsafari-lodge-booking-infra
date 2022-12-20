@@ -60,7 +60,7 @@ func show(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, e
 			return clientError(http.StatusBadRequest, "Expected a 'fromDate' parameter")
 		}
 
-		// Fetch the booking record from the database based on the bookingId value.
+		// Fetch the booking record from the database based on the fromDate value.
 		bks, err := getBookings(fromDate)
 		if err != nil {
 			return serverError(err)

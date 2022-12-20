@@ -20,6 +20,7 @@ func getBookings(minFromDate string) (*[]booking, error) {
 	proj := expression.NamesList(
 		expression.Name("bookingId"),
 		expression.Name("userId"),
+		expression.Name("fromDate"),
 		expression.Name("toDate"),
 		expression.Name("houses"),
 		expression.Name("guestDetails"),
