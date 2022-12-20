@@ -53,17 +53,12 @@ func show(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, e
 
 	switch resourceName {
 	case "booking":
-		// Get the `bookingId` query string parameter from the request and
+		// Get the `fromDate` query string parameter from the request and
 		// validate it.
-		// bookingId := req.QueryStringParameters["bookingId"]
 		fromDate := req.QueryStringParameters["fromDate"]
-		// if bookingId == "" && fromDate == "" {
 		if fromDate == "" {
 			return clientError(http.StatusBadRequest, "Expected a 'fromDate' parameter")
 		}
-		// if !uuidRegexp.MatchString(bookingId) {
-		// 	return clientError(http.StatusBadRequest, "Invalid bookingId")
-		// }
 
 		// Fetch the booking record from the database based on the bookingId value.
 		bks, err := getBookings(fromDate)
