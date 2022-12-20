@@ -61,7 +61,8 @@ resource "aws_iam_policy" "iam_dynamodb_privilege_policy" {
       {
         "Action" : [
           "dynamodb:PutItem",
-          "dynamodb:GetItem"
+          "dynamodb:GetItem",
+          "dynamodb:Scan"
         ],
         "Resource" : "*",
         "Effect" : "Allow"

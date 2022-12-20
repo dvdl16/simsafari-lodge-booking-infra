@@ -40,35 +40,49 @@ func router(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse,
 }
 
 func show(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
-	// Get the `bookingId` query string parameter from the request and
-	// validate it.
-	bookingId := req.QueryStringParameters["bookingId"]
-	if !uuidRegexp.MatchString(bookingId) {
-		return clientError(http.StatusBadRequest, "Invalid bookingId")
-	}
+	// Get the `resource` query string parameter from the request and validate it.
+	resourceName := req.QueryStringParameters["resource"]
 
-	// Fetch the booking record from the database based on the bookingId value.
-	bk, err := getItem(bookingId)
-	if err != nil {
-		return serverError(err)
-	}
-	if bk == nil {
-		return clientError(http.StatusNotFound, "Booking not found")
-	}
+	switch resourceName {
+	case "booking":
+		// Get the `bookingId` query string parameter from the request and
+		// validate it.
+		// bookingId := req.QueryStringParameters["bookingId"]
+		fromDate := req.QueryStringParameters["fromDate"]
+		// if bookingId == "" && fromDate == "" {
+		if fromDate == "" {
+			return clientError(http.StatusBadRequest, "Expected a 'fromDate' parameter")
+		}
+		// if !uuidRegexp.MatchString(bookingId) {
+		// 	return clientError(http.StatusBadRequest, "Invalid bookingId")
+		// }
 
-	// The APIGatewayProxyResponse.Body field needs to be a string, so
-	// we marshal the booking record into JSON.
-	js, err := json.Marshal(bk)
-	if err != nil {
-		return serverError(err)
-	}
+		// Fetch the booking record from the database based on the bookingId value.
+		bks, err := getBookings(fromDate)
+		if err != nil {
+			return serverError(err)
+		}
+		if bks == nil {
+			return clientError(http.StatusNotFound, "Bookings not found")
+		}
 
-	// Return a response with a 200 OK status and the JSON booking record
-	// as the body.
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusOK,
-		Body:       string(js),
-	}, nil
+		// The APIGatewayProxyResponse.Body field needs to be a string, so
+		// we marshal the booking record into JSON.
+		js, err := json.Marshal(bks)
+		if err != nil {
+			return serverError(err)
+		}
+
+		// Return a response with a 200 OK status and the JSON booking record
+		// as the body.
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusOK,
+			Body:       string(js),
+		}, nil
+	case "user":
+		return clientError(http.StatusBadRequest, "User 'resource' not implemented")
+	}
+	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
 }
 
 func create(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
