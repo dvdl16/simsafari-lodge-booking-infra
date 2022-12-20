@@ -83,7 +83,28 @@ func show(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, e
 			Body:       string(js),
 		}, nil
 	case "user":
-		return clientError(http.StatusBadRequest, "User 'resource' not implemented")
+		// Fetch the user records from the database.
+		users, err := getUsers()
+		if err != nil {
+			return serverError(err)
+		}
+		if users == nil {
+			return clientError(http.StatusNotFound, "Users not found")
+		}
+
+		// The APIGatewayProxyResponse.Body field needs to be a string, so
+		// we marshal the user record into JSON.
+		js, err := json.Marshal(users)
+		if err != nil {
+			return serverError(err)
+		}
+
+		// Return a response with a 200 OK status and the JSON booking record
+		// as the body.
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusOK,
+			Body:       string(js),
+		}, nil
 	}
 	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
 }
@@ -92,32 +113,67 @@ func create(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse,
 	if req.Headers["content-type"] != "application/json" && req.Headers["Content-Type"] != "application/json" {
 		return clientError(http.StatusNotAcceptable, "Malformed or incorrect headers")
 	}
+	resourceName := req.QueryStringParameters["resource"]
 
-	bk := new(booking)
-	err := json.Unmarshal([]byte(req.Body), bk)
-	if err != nil {
-		errorLogger.Println("Request has invalid format:")
-		errorLogger.Println(err)
-		return clientError(http.StatusUnprocessableEntity, "Invalid object format")
-	}
+	switch resourceName {
+	case "booking":
+		bk := new(booking)
+		err := json.Unmarshal([]byte(req.Body), bk)
+		if err != nil {
+			errorLogger.Println("Request has invalid format:")
+			errorLogger.Println(err)
+			return clientError(http.StatusUnprocessableEntity, "Invalid object format")
+		}
 
-	// TODO Generate UUID booking ID
-	if !uuidRegexp.MatchString(bk.BookingId) {
-		return clientError(http.StatusBadRequest, "Invalid booking ID")
-	}
-	if bk.GuestDetails == "" {
-		return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
-	}
+		// TODO Generate UUID booking ID
+		if !uuidRegexp.MatchString(bk.BookingId) {
+			return clientError(http.StatusBadRequest, "Invalid booking ID")
+		}
+		if bk.GuestDetails == "" {
+			return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
+		}
 
-	err = putBooking(bk)
-	if err != nil {
-		return serverError(err)
-	}
+		err = putBooking(bk)
+		if err != nil {
+			return serverError(err)
+		}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: 201,
-		Headers:    map[string]string{"Location": fmt.Sprintf("/books?bookingId=%s", bk.BookingId)},
-	}, nil
+		return events.APIGatewayProxyResponse{
+			StatusCode: 201,
+			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?bookingId=%s", bk.BookingId)},
+		}, nil
+
+	case "user":
+		usr := new(user)
+		err := json.Unmarshal([]byte(req.Body), usr)
+		if err != nil {
+			errorLogger.Println("Request has invalid format:")
+			errorLogger.Println(err)
+			return clientError(http.StatusUnprocessableEntity, "Invalid object format")
+		}
+
+		// TODO Generate UUID user ID
+		if !uuidRegexp.MatchString(usr.UserId) {
+			return clientError(http.StatusBadRequest, "Invalid user ID")
+		}
+		if usr.Name == "" {
+			return clientError(http.StatusBadRequest, "Name cannot be empty")
+		}
+		if usr.Phone == "" {
+			return clientError(http.StatusBadRequest, "Phone cannot be empty")
+		}
+
+		err = putUser(usr)
+		if err != nil {
+			return serverError(err)
+		}
+
+		return events.APIGatewayProxyResponse{
+			StatusCode: 201,
+			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?userId=%s", usr.UserId)},
+		}, nil
+	}
+	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
 }
 
 // Add a helper for handling errors. This logs any error to os.Stderr
