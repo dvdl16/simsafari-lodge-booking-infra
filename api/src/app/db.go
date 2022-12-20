@@ -92,6 +92,44 @@ func putBooking(bk *booking) error {
 	return err
 }
 
+// Update a booking record in DynamoDB.
+func updateBooking(bk *booking) error {
+	var houses []*string
+	for _, i := range bk.Houses {
+		houses = append(houses, aws.String(i))
+	}
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":userId": {
+				S: aws.String(bk.UserId),
+			},
+			":fromDate": {
+				S: aws.String(bk.FromDate),
+			},
+			":toDate": {
+				S: aws.String(bk.ToDate),
+			},
+			":houses": {
+				SS: houses,
+			},
+			":guestDetails": {
+				S: aws.String(bk.GuestDetails),
+			},
+		},
+		TableName: aws.String("tf-bookings-table"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"bookingId": {
+				S: aws.String(bk.BookingId),
+			},
+		},
+		ReturnValues:     aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String("set userId = :userId, fromDate = :fromDate, toDate = :toDate, houses = :houses, guestDetails = :guestDetails"),
+	}
+
+	_, err := db.UpdateItem(input)
+	return err
+}
+
 func getUsers() (*[]user, error) {
 	// Prepare the input for the query.
 	proj := expression.NamesList(
@@ -164,5 +202,45 @@ func putUser(usr *user) error {
 	}
 
 	_, err := db.PutItem(input)
+	return err
+}
+
+// Update a user record in DynamoDB.
+func updateUser(usr *user) error {
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":n": {
+				S: aws.String(usr.Name),
+			},
+			":phone": {
+				S: aws.String(usr.Phone),
+			},
+			":email": {
+				S: aws.String(usr.Email),
+			},
+			":lastLoggedIn": {
+				S: aws.String(usr.LastLoggedIn),
+			},
+			":otp": {
+				S: aws.String(usr.OTP),
+			},
+			":thirdParty": {
+				S: aws.String(usr.ThirdParty),
+			},
+		},
+		ExpressionAttributeNames: map[string]*string{
+			"#username": aws.String("name"),
+		},
+		TableName: aws.String("tf-users-table"),
+		Key: map[string]*dynamodb.AttributeValue{
+			"userId": {
+				S: aws.String(usr.UserId),
+			},
+		},
+		ReturnValues:     aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String("set #username = :n, phone = :phone, email = :email, lastLoggedIn = :lastLoggedIn, otp = :otp, thirdParty = :thirdParty"),
+	}
+
+	_, err := db.UpdateItem(input)
 	return err
 }

@@ -42,6 +42,8 @@ func router(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse,
 		return show(req)
 	case "POST":
 		return create(req)
+	case "PUT":
+		return update(req)
 	default:
 		return clientError(http.StatusMethodNotAllowed, "Only GET and POST allowed")
 	}
@@ -170,6 +172,73 @@ func create(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse,
 
 		return events.APIGatewayProxyResponse{
 			StatusCode: 201,
+			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?userId=%s", usr.UserId)},
+		}, nil
+	}
+	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
+}
+
+func update(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
+	if req.Headers["content-type"] != "application/json" && req.Headers["Content-Type"] != "application/json" {
+		return clientError(http.StatusNotAcceptable, "Malformed or incorrect headers")
+	}
+	resourceName := req.QueryStringParameters["resource"]
+
+	switch resourceName {
+	case "booking":
+		bk := new(booking)
+		err := json.Unmarshal([]byte(req.Body), bk)
+		if err != nil {
+			errorLogger.Println("Request has invalid format:")
+			errorLogger.Println(err)
+			return clientError(http.StatusUnprocessableEntity, "Invalid object format")
+		}
+
+		// Validation
+		if !uuidRegexp.MatchString(bk.BookingId) {
+			return clientError(http.StatusBadRequest, "Invalid booking ID")
+		}
+		if bk.GuestDetails == "" {
+			return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
+		}
+
+		err = updateBooking(bk)
+		if err != nil {
+			return serverError(err)
+		}
+
+		return events.APIGatewayProxyResponse{
+			StatusCode: 200,
+			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?bookingId=%s", bk.BookingId)},
+		}, nil
+
+	case "user":
+		usr := new(user)
+		err := json.Unmarshal([]byte(req.Body), usr)
+		if err != nil {
+			errorLogger.Println("Request has invalid format:")
+			errorLogger.Println(err)
+			return clientError(http.StatusUnprocessableEntity, "Invalid object format")
+		}
+
+		// Validation
+		if !uuidRegexp.MatchString(usr.UserId) {
+			return clientError(http.StatusBadRequest, "Invalid user ID")
+		}
+		if usr.Name == "" {
+			return clientError(http.StatusBadRequest, "Name cannot be empty")
+		}
+		if usr.Phone == "" {
+			return clientError(http.StatusBadRequest, "Phone cannot be empty")
+		}
+
+		err = updateUser(usr)
+		if err != nil {
+			return serverError(err)
+		}
+
+		return events.APIGatewayProxyResponse{
+			StatusCode: 200,
 			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?userId=%s", usr.UserId)},
 		}, nil
 	}
