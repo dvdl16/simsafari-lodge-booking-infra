@@ -9,8 +9,17 @@ This repository contains source code for managing the infrastructure and backend
 ### Deploying the infrastructure
 Make sure to have a `.tfvars` file or to supply the following terraform variables:
 ```bash
-aws_provider_profile_name
-aws_region
+aws_profile_name = "kdefault"
+aws_region       = "eu-west-1"
+aws_account_id   = "1234567"
+
+domain_name = "example.com"
+bucket_name = "example.com"
+
+common_tags = {
+  Project = "my-project"
+}
+
 ```
 
 
