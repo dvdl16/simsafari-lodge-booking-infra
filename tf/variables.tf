@@ -12,3 +12,17 @@ variable "aws_account_id" {
   type        = string
   description = "The AWS account ID. Should match up with the account ID defined in the named CLI profile supplied in 'aws_profile_name'"
 }
+
+variable "domain_name" {
+  type        = string
+  description = "The domain name for the website."
+}
+
+variable "bucket_name" {
+  type        = string
+  description = "The name of the bucket without the www. prefix. Normally domain_name."
+}
+
+variable "common_tags" {
+  description = "Common tags to be applied to all components."
+}

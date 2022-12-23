@@ -16,8 +16,14 @@ aws_region
 
 To deploying the infrastructure, use the following terraform commands:
 ```bash
-terraform plan -var-file="test_env.tfvars"
-terraform apply -var-file="test_env.tfvars"
+cd tf
+
+# Only required for the first-time run
+AWS_PROFILE=jabulani terraform init
+
+# Run to deploy from your workstation
+terraform plan -var-file="terraform.tfvars"
+terraform apply -var-file="terraform.tfvars"
 ```
 
 *Note that terraform expects a AWS CLI profile named `jabulani`.

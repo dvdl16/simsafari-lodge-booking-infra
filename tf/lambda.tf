@@ -1,15 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-}
-
-provider "aws" {
-  profile = var.aws_profile_name
-}
-
 
 # Roles
 resource "aws_iam_role" "iam_for_lambda" {
@@ -72,27 +60,27 @@ resource "aws_iam_policy" "iam_dynamodb_privilege_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
-  role       = aws_iam_role.iam_for_lambda.name
-  policy_arn = aws_iam_policy.iam_policy_for_lambda.arn
-}
-
 resource "aws_iam_role_policy_attachment" "attach_iam_dynamodb_privilege_policy_to_iam_role" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = aws_iam_policy.iam_dynamodb_privilege_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
+  role       = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda.arn
+}
+
 # Data
 data "archive_file" "zipped_go_code" {
   type        = "zip"
-  source_dir  = "${path.module}/api/"
-  output_path = "${path.module}/api/main.zip"
+  source_dir  = "${path.module}/../api/"
+  output_path = "${path.module}/../api/main.zip"
 }
 
 # Lambda Function
 resource "aws_lambda_function" "terraform_lambda_func" {
-  filename         = "${path.module}/api/main.zip"
-  source_code_hash = filebase64sha256("${path.module}/api/main.zip")
+  filename         = "${path.module}/../api/main.zip"
+  source_code_hash = filebase64sha256("${path.module}/../api/main.zip")
   function_name    = "SimSafari_Lodge_Booking_API"
   role             = aws_iam_role.iam_for_lambda.arn
   handler          = "main"
@@ -105,59 +93,6 @@ resource "aws_lambda_function_url" "terraform_lambda_func_url_latest" {
   authorization_type = "NONE"
 }
 
-# Database table for bookings
-resource "aws_dynamodb_table" "tf_bookings_table" {
-  name           = "tf-bookings-table"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = "5"
-  write_capacity = "5"
-  attribute {
-    name = "bookingId"
-    type = "S"
-  }
-  hash_key = "bookingId"
-}
-
-# Database table for users
-resource "aws_dynamodb_table" "tf_users_table" {
-  name           = "tf-users-table"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = "5"
-  write_capacity = "5"
-  attribute {
-    name = "userId"
-    type = "S"
-  }
-  hash_key = "userId"
-}
-
-# API Gateway
-resource "aws_api_gateway_rest_api" "tf_bookings_store" {
-  name = "tf_bookings_store"
-}
-
-resource "aws_api_gateway_resource" "bookings" {
-  parent_id   = aws_api_gateway_rest_api.tf_bookings_store.root_resource_id
-  path_part   = "bookings"
-  rest_api_id = aws_api_gateway_rest_api.tf_bookings_store.id
-}
-
-resource "aws_api_gateway_method" "bookings_method" {
-  authorization = "NONE"
-  http_method   = "ANY"
-  resource_id   = aws_api_gateway_resource.bookings.id
-  rest_api_id   = aws_api_gateway_rest_api.tf_bookings_store.id
-}
-
-resource "aws_api_gateway_integration" "bookings_lambda_integration" {
-  http_method             = aws_api_gateway_method.bookings_method.http_method
-  resource_id             = aws_api_gateway_resource.bookings.id
-  rest_api_id             = aws_api_gateway_rest_api.tf_bookings_store.id
-  type                    = "AWS_PROXY"
-  integration_http_method = "POST"
-  uri                     = aws_lambda_function.terraform_lambda_func.invoke_arn
-  content_handling        = "CONVERT_TO_TEXT"
-}
 
 resource "aws_lambda_permission" "tf_bookings_store_lambda" {
   statement_id  = "AllowExecutionFromAPIGateway"
@@ -168,10 +103,4 @@ resource "aws_lambda_permission" "tf_bookings_store_lambda" {
   # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
   source_arn = "arn:aws:execute-api:${var.aws_region}:${var.aws_account_id}:${aws_api_gateway_rest_api.tf_bookings_store.id}/*/${aws_api_gateway_method.bookings_method.http_method}${aws_api_gateway_resource.bookings.path}"
 }
-
-
-# aws lambda add-permission --function-name books --statement-id a-GUID \
-# --action lambda:InvokeFunction --principal apigateway.amazonaws.com \
-# --source-arn arn:aws:execute-api:us-east-1:account-id:rest-api-id/*/*/*
-
 
