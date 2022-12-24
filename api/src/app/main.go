@@ -25,16 +25,6 @@ type booking struct {
 	GuestDetails string   `json:"guestDetails"`
 }
 
-type user struct {
-	UserId       string `json:"userId"`
-	Name         string `json:"name"`
-	Phone        string `json:"phone"`
-	Email        string `json:"email"`
-	LastLoggedIn string `json:"lastLoggedIn"`
-	OTP          string `json:"otp"`
-	ThirdParty   string `json:"thirdParty"`
-}
-
 // Do a switch on the HTTP request method to determine which action to take.
 func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// debugLogger.Println("Request Authorization Headers:")
@@ -52,199 +42,102 @@ func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 }
 
 func show(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	// Get the `resource` query string parameter from the request and validate it.
-	resourceName := req.QueryStringParameters["resource"]
-
-	switch resourceName {
-	case "booking":
-		// Get the `fromDate` query string parameter from the request and
-		// validate it.
-		fromDate := req.QueryStringParameters["fromDate"]
-		if fromDate == "" {
-			return clientError(http.StatusBadRequest, "Expected a 'fromDate' parameter")
-		}
-
-		// Fetch the booking record from the database based on the fromDate value.
-		bks, err := getBookings(fromDate)
-		if err != nil {
-			return serverError(err)
-		}
-		if bks == nil {
-			return clientError(http.StatusNotFound, "Bookings not found")
-		}
-
-		// The APIGatewayProxyResponse.Body field needs to be a string, so
-		// we marshal the booking record into JSON.
-		js, err := json.Marshal(bks)
-		if err != nil {
-			return serverError(err)
-		}
-
-		// Return a response with a 200 OK status and the JSON booking record
-		// as the body.
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusOK,
-			Body:       string(js),
-		}, nil
-	case "user":
-		// Fetch the user records from the database.
-		users, err := getUsers()
-		if err != nil {
-			return serverError(err)
-		}
-		if users == nil {
-			return clientError(http.StatusNotFound, "Users not found")
-		}
-
-		// The APIGatewayProxyResponse.Body field needs to be a string, so
-		// we marshal the user record into JSON.
-		js, err := json.Marshal(users)
-		if err != nil {
-			return serverError(err)
-		}
-
-		// Return a response with a 200 OK status and the JSON booking record
-		// as the body.
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusOK,
-			Body:       string(js),
-		}, nil
+	// Get the `fromDate` query string parameter from the request and
+	// validate it.
+	fromDate := req.QueryStringParameters["fromDate"]
+	if fromDate == "" {
+		return clientError(http.StatusBadRequest, "Expected a 'fromDate' parameter")
 	}
-	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
+
+	// Fetch the booking record from the database based on the fromDate value.
+	bks, err := getBookings(fromDate)
+	if err != nil {
+		return serverError(err)
+	}
+	if bks == nil {
+		return clientError(http.StatusNotFound, "Bookings not found")
+	}
+
+	// The APIGatewayProxyResponse.Body field needs to be a string, so
+	// we marshal the booking record into JSON.
+	js, err := json.Marshal(bks)
+	if err != nil {
+		return serverError(err)
+	}
+
+	// Return a response with a 200 OK status and the JSON booking record
+	// as the body.
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Body:       string(js),
+	}, nil
+
 }
 
 func create(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if req.Headers["content-type"] != "application/json" && req.Headers["Content-Type"] != "application/json" {
 		return clientError(http.StatusNotAcceptable, "Malformed or incorrect headers")
 	}
-	resourceName := req.QueryStringParameters["resource"]
 
-	switch resourceName {
-	case "booking":
-		bk := new(booking)
-		err := json.Unmarshal([]byte(req.Body), bk)
-		if err != nil {
-			errorLogger.Println("Request has invalid format:")
-			errorLogger.Println(err)
-			return clientError(http.StatusUnprocessableEntity, "Invalid object format")
-		}
-
-		// TODO Generate UUID booking ID
-		if !uuidRegexp.MatchString(bk.BookingId) {
-			return clientError(http.StatusBadRequest, "Invalid booking ID")
-		}
-		if bk.GuestDetails == "" {
-			return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
-		}
-
-		err = putBooking(bk)
-		if err != nil {
-			return serverError(err)
-		}
-
-		return events.APIGatewayProxyResponse{
-			StatusCode: 201,
-			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?bookingId=%s", bk.BookingId)},
-		}, nil
-
-	case "user":
-		usr := new(user)
-		err := json.Unmarshal([]byte(req.Body), usr)
-		if err != nil {
-			errorLogger.Println("Request has invalid format:")
-			errorLogger.Println(err)
-			return clientError(http.StatusUnprocessableEntity, "Invalid object format")
-		}
-
-		// TODO Generate UUID user ID
-		if !uuidRegexp.MatchString(usr.UserId) {
-			return clientError(http.StatusBadRequest, "Invalid user ID")
-		}
-		if usr.Name == "" {
-			return clientError(http.StatusBadRequest, "Name cannot be empty")
-		}
-		if usr.Phone == "" {
-			return clientError(http.StatusBadRequest, "Phone cannot be empty")
-		}
-
-		err = putUser(usr)
-		if err != nil {
-			return serverError(err)
-		}
-
-		return events.APIGatewayProxyResponse{
-			StatusCode: 201,
-			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?userId=%s", usr.UserId)},
-		}, nil
+	bk := new(booking)
+	err := json.Unmarshal([]byte(req.Body), bk)
+	if err != nil {
+		errorLogger.Println("Request has invalid format:")
+		errorLogger.Println(err)
+		return clientError(http.StatusUnprocessableEntity, "Invalid object format")
 	}
-	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
+
+	// TODO Generate UUID booking ID
+	if !uuidRegexp.MatchString(bk.BookingId) {
+		return clientError(http.StatusBadRequest, "Invalid booking ID")
+	}
+	if bk.GuestDetails == "" {
+		return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
+	}
+
+	err = putBooking(bk)
+	if err != nil {
+		return serverError(err)
+	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 201,
+		Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?bookingId=%s", bk.BookingId)},
+	}, nil
+
 }
 
 func update(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if req.Headers["content-type"] != "application/json" && req.Headers["Content-Type"] != "application/json" {
 		return clientError(http.StatusNotAcceptable, "Malformed or incorrect headers")
 	}
-	resourceName := req.QueryStringParameters["resource"]
 
-	switch resourceName {
-	case "booking":
-		bk := new(booking)
-		err := json.Unmarshal([]byte(req.Body), bk)
-		if err != nil {
-			errorLogger.Println("Request has invalid format:")
-			errorLogger.Println(err)
-			return clientError(http.StatusUnprocessableEntity, "Invalid object format")
-		}
-
-		// Validation
-		if !uuidRegexp.MatchString(bk.BookingId) {
-			return clientError(http.StatusBadRequest, "Invalid booking ID")
-		}
-		if bk.GuestDetails == "" {
-			return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
-		}
-
-		err = updateBooking(bk)
-		if err != nil {
-			return serverError(err)
-		}
-
-		return events.APIGatewayProxyResponse{
-			StatusCode: 200,
-			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?bookingId=%s", bk.BookingId)},
-		}, nil
-
-	case "user":
-		usr := new(user)
-		err := json.Unmarshal([]byte(req.Body), usr)
-		if err != nil {
-			errorLogger.Println("Request has invalid format:")
-			errorLogger.Println(err)
-			return clientError(http.StatusUnprocessableEntity, "Invalid object format")
-		}
-
-		// Validation
-		if !uuidRegexp.MatchString(usr.UserId) {
-			return clientError(http.StatusBadRequest, "Invalid user ID")
-		}
-		if usr.Name == "" {
-			return clientError(http.StatusBadRequest, "Name cannot be empty")
-		}
-		if usr.Phone == "" {
-			return clientError(http.StatusBadRequest, "Phone cannot be empty")
-		}
-
-		err = updateUser(usr)
-		if err != nil {
-			return serverError(err)
-		}
-
-		return events.APIGatewayProxyResponse{
-			StatusCode: 200,
-			Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?userId=%s", usr.UserId)},
-		}, nil
+	bk := new(booking)
+	err := json.Unmarshal([]byte(req.Body), bk)
+	if err != nil {
+		errorLogger.Println("Request has invalid format:")
+		errorLogger.Println(err)
+		return clientError(http.StatusUnprocessableEntity, "Invalid object format")
 	}
-	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
+
+	// Validation
+	if !uuidRegexp.MatchString(bk.BookingId) {
+		return clientError(http.StatusBadRequest, "Invalid booking ID")
+	}
+	if bk.GuestDetails == "" {
+		return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
+	}
+
+	err = updateBooking(bk)
+	if err != nil {
+		return serverError(err)
+	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?bookingId=%s", bk.BookingId)},
+	}, nil
+
 }
 
 // Add a helper for handling errors. This logs any error to os.Stderr
