@@ -24,6 +24,8 @@ func getBookings(minFromDate string) (*[]booking, error) {
 		expression.Name("toDate"),
 		expression.Name("houses"),
 		expression.Name("guestDetails"),
+		expression.Name("userContact"),
+		expression.Name("userName"),
 	)
 	expr, err := expression.NewBuilder().WithFilter(filt).WithProjection(proj).Build()
 
@@ -85,6 +87,12 @@ func putBooking(bk *booking) error {
 			"guestDetails": {
 				S: aws.String(bk.GuestDetails),
 			},
+			"userContact": {
+				S: aws.String(bk.UserContact),
+			},
+			"userName": {
+				S: aws.String(bk.UserName),
+			},
 		},
 	}
 
@@ -115,6 +123,12 @@ func updateBooking(bk *booking) error {
 			":guestDetails": {
 				S: aws.String(bk.GuestDetails),
 			},
+			":userContact": {
+				S: aws.String(bk.UserContact),
+			},
+			":userName": {
+				S: aws.String(bk.UserName),
+			},
 		},
 		TableName: aws.String("tf-bookings-table"),
 		Key: map[string]*dynamodb.AttributeValue{
@@ -123,7 +137,7 @@ func updateBooking(bk *booking) error {
 			},
 		},
 		ReturnValues:     aws.String("UPDATED_NEW"),
-		UpdateExpression: aws.String("set userId = :userId, fromDate = :fromDate, toDate = :toDate, houses = :houses, guestDetails = :guestDetails"),
+		UpdateExpression: aws.String("set userId = :userId, fromDate = :fromDate, toDate = :toDate, houses = :houses, guestDetails = :guestDetails, userContact = :userContact, userName = :userName"),
 	}
 
 	_, err := db.UpdateItem(input)

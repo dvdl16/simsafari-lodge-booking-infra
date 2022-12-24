@@ -23,6 +23,8 @@ type booking struct {
 	ToDate       string   `json:"toDate"`
 	Houses       []string `json:"houses` // Type SS (String Set) in DynamoDB
 	GuestDetails string   `json:"guestDetails"`
+	UserContact  string   `json:"userContact"`
+	UserName     string   `json:"userName"`
 }
 
 // Do a switch on the HTTP request method to determine which action to take.
@@ -94,6 +96,12 @@ func create(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	if bk.GuestDetails == "" {
 		return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
 	}
+	if bk.UserContact == "" {
+		return clientError(http.StatusBadRequest, "User Contact cannot be empty")
+	}
+	if bk.UserName == "" {
+		return clientError(http.StatusBadRequest, "User Name cannot be empty")
+	}
 
 	err = putBooking(bk)
 	if err != nil {
@@ -126,6 +134,12 @@ func update(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	}
 	if bk.GuestDetails == "" {
 		return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
+	}
+	if bk.UserContact == "" {
+		return clientError(http.StatusBadRequest, "User Contact cannot be empty")
+	}
+	if bk.UserName == "" {
+		return clientError(http.StatusBadRequest, "User Name cannot be empty")
 	}
 
 	err = updateBooking(bk)
