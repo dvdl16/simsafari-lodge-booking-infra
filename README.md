@@ -16,6 +16,9 @@ aws_account_id   = "1234567"
 domain_name = "example.com"
 bucket_name = "example.com"
 
+google_client_id = "12345abcd.apps.googleusercontent.com"
+google_client_secret = "ABCDEFG"
+
 common_tags = {
   Project = "my-project"
 }

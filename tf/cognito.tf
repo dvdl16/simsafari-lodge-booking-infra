@@ -11,7 +11,7 @@ resource "aws_cognito_user_pool" "lambda_user_pool" {
     name                     = "name"
     attribute_data_type      = "String"
     developer_only_attribute = false
-    mutable                  = false
+    mutable                  = true
     required                 = true
 
     string_attribute_constraints {
@@ -30,10 +30,34 @@ resource "aws_cognito_user_pool_client" "userpool_client" {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code", "implicit"]
   allowed_oauth_scopes                 = ["email", "openid", "phone", "profile"]
-  supported_identity_providers         = ["COGNITO"]
+  supported_identity_providers         = ["COGNITO", aws_cognito_identity_provider.google_provider.provider_name]
 }
 
 resource "aws_cognito_user_pool_domain" "main" {
   domain       = replace(var.domain_name, ".co.za", "")
   user_pool_id = aws_cognito_user_pool.lambda_user_pool.id
+}
+
+resource "aws_cognito_identity_provider" "google_provider" {
+  user_pool_id  = aws_cognito_user_pool.lambda_user_pool.id
+  provider_name = "Google"
+  provider_type = "Google"
+
+  provider_details = {
+    authorize_scopes              = "profile email openid"
+    client_id                     = var.google_client_id
+    client_secret                 = var.google_client_secret
+    attributes_url                = "https://people.googleapis.com/v1/people/me?personFields="
+    attributes_url_add_attributes = "true"
+    authorize_url                 = "https://accounts.google.com/o/oauth2/v2/auth"
+    oidc_issuer                   = "https://accounts.google.com"
+    token_request_method          = "POST"
+    token_url                     = "https://www.googleapis.com/oauth2/v4/token"
+  }
+
+  attribute_mapping = {
+    email    = "email"
+    name     = "name"
+    username = "sub"
+  }
 }

@@ -23,6 +23,16 @@ variable "bucket_name" {
   description = "The name of the bucket without the www. prefix. Normally domain_name."
 }
 
+variable "google_client_id" {
+  type        = string
+  description = "A Google OAuth Client ID, used for authentication with Cognito."
+}
+
+variable "google_client_secret" {
+  type        = string
+  description = "A Google OAuth Client ID, used for authentication with Cognito."
+}
+
 variable "common_tags" {
   description = "Common tags to be applied to all components."
 }
