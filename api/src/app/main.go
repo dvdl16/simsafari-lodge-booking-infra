@@ -36,8 +36,10 @@ type user struct {
 }
 
 // Do a switch on the HTTP request method to determine which action to take.
-func router(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
-	switch req.RequestContext.HTTP.Method {
+func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	// debugLogger.Println("Request Authorization Headers:")
+	// debugLogger.Println(req.Headers["Authorization"])
+	switch req.HTTPMethod {
 	case "GET":
 		return show(req)
 	case "POST":
@@ -49,7 +51,7 @@ func router(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse,
 	}
 }
 
-func show(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
+func show(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Get the `resource` query string parameter from the request and validate it.
 	resourceName := req.QueryStringParameters["resource"]
 
@@ -111,7 +113,7 @@ func show(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, e
 	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
 }
 
-func create(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
+func create(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if req.Headers["content-type"] != "application/json" && req.Headers["Content-Type"] != "application/json" {
 		return clientError(http.StatusNotAcceptable, "Malformed or incorrect headers")
 	}
@@ -178,7 +180,7 @@ func create(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse,
 	return clientError(http.StatusBadRequest, "Invalid 'resource' parameter supplied")
 }
 
-func update(req events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
+func update(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if req.Headers["content-type"] != "application/json" && req.Headers["Content-Type"] != "application/json" {
 		return clientError(http.StatusNotAcceptable, "Malformed or incorrect headers")
 	}
