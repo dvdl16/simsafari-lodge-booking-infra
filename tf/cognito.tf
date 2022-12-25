@@ -26,7 +26,7 @@ resource "aws_cognito_user_pool" "lambda_user_pool" {
 resource "aws_cognito_user_pool_client" "userpool_client" {
   name                                 = "cognito_userpool_client"
   user_pool_id                         = aws_cognito_user_pool.lambda_user_pool.id
-  callback_urls                        = ["https://www.${var.domain_name}"]
+  callback_urls                        = ["https://www.${var.domain_name}/user/login"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code", "implicit"]
   allowed_oauth_scopes                 = ["email", "openid", "phone", "profile"]
