@@ -29,6 +29,8 @@ type booking struct {
 // Do a switch on the HTTP request method to determine which action to take.
 func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	switch req.HTTPMethod {
+	case "OPTIONS":
+		return options(req)
 	case "GET":
 		return show(req)
 	case "POST":
@@ -38,6 +40,21 @@ func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	default:
 		return clientError(http.StatusMethodNotAllowed, "Only GET and POST allowed")
 	}
+}
+
+func options(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	// Return a response with a 200 OK status and the required CORS headers
+	return events.APIGatewayProxyResponse{
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin":      "*",
+			"Access-Control-Allow-Methods":     "GET,POST,PUT,DELETE,OPTIONS",
+			"Access-Control-Allow-Headers":     "X-Amz-Date,X-Api-Key,X-Amz-Security-Token,X-Requested-With,X-Auth-Token,Referer,User-Agent,Origin,Content-Type,Authorization,Accept,Access-Control-Allow-Methods,Access-Control-Allow-Origin,Access-Control-Allow-Headers",
+			"Access-Control-Allow-Credentials": "'true'",
+		},
+		StatusCode: http.StatusOK,
+		Body:       string("Hello world"),
+	}, nil
+
 }
 
 func show(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -67,6 +84,12 @@ func show(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, er
 	// Return a response with a 200 OK status and the JSON booking record
 	// as the body.
 	return events.APIGatewayProxyResponse{
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin":      "*",
+			"Access-Control-Allow-Methods":     "GET,POST,PUT,DELETE,OPTIONS",
+			"Access-Control-Allow-Headers":     "X-Amz-Date,X-Api-Key,X-Amz-Security-Token,X-Requested-With,X-Auth-Token,Referer,User-Agent,Origin,Content-Type,Authorization,Accept,Access-Control-Allow-Methods,Access-Control-Allow-Origin,Access-Control-Allow-Headers",
+			"Access-Control-Allow-Credentials": "'true'",
+		},
 		StatusCode: http.StatusOK,
 		Body:       string(js),
 	}, nil
@@ -104,9 +127,23 @@ func create(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 		return serverError(err)
 	}
 
+	// The APIGatewayProxyResponse.Body field needs to be a string, so
+	// we marshal the booking record into JSON.
+	js, err := json.Marshal(bk)
+	if err != nil {
+		return serverError(err)
+	}
+
 	return events.APIGatewayProxyResponse{
 		StatusCode: 201,
-		Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?bookingId=%s", bk.BookingId)},
+		Headers: map[string]string{
+			"Location":                         fmt.Sprintf("/bookings?id=%s", bk.Id),
+			"Access-Control-Allow-Origin":      "*",
+			"Access-Control-Allow-Methods":     "GET,POST,PUT,DELETE,OPTIONS",
+			"Access-Control-Allow-Headers":     "X-Amz-Date,X-Api-Key,X-Amz-Security-Token,X-Requested-With,X-Auth-Token,Referer,User-Agent,Origin,Content-Type,Authorization,Accept,Access-Control-Allow-Methods,Access-Control-Allow-Origin,Access-Control-Allow-Headers",
+			"Access-Control-Allow-Credentials": "'true'",
+		},
+		Body: string(js),
 	}, nil
 
 }
@@ -142,7 +179,16 @@ func update(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
-		Headers:    map[string]string{"Location": fmt.Sprintf("/bookings?bookingId=%s", bk.BookingId)},
+		Headers: map[string]string{
+			"Location":                         fmt.Sprintf("/bookings?id=%s", bk.Id),
+			"Access-Control-Allow-Origin":      "*",
+			"Access-Control-Allow-Methods":     "GET,POST,PUT,DELETE,OPTIONS",
+			"Access-Control-Allow-Headers":     "X-Amz-Date,X-Api-Key,X-Amz-Security-Token,X-Requested-With,X-Auth-Token,Referer,User-Agent,Origin,Content-Type,Authorization,Accept,Access-Control-Allow-Methods,Access-Control-Allow-Origin,Access-Control-Allow-Headers",
+			"Access-Control-Allow-Credentials": "'true'",
+		},
+	}, nil
+
+}
 	}, nil
 
 }
