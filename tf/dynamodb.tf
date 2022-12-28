@@ -5,8 +5,8 @@ resource "aws_dynamodb_table" "tf_bookings_table" {
   read_capacity  = "5"
   write_capacity = "5"
   attribute {
-    name = "bookingId"
+    name = "id"
     type = "S"
   }
-  hash_key = "bookingId"
+  hash_key = "id"
 }

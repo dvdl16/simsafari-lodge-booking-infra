@@ -10,6 +10,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/google/uuid"
 )
 
 var uuidRegexp = regexp.MustCompile(`^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$`)
@@ -17,7 +18,7 @@ var errorLogger = log.New(os.Stderr, "ERROR ", log.Llongfile)
 var debugLogger = log.New(os.Stderr, "DEBUG ", log.Llongfile)
 
 type booking struct {
-	BookingId    string   `json:"bookingId"`
+	Id           string   `json:"id"`
 	UserId       string   `json:"userId"`
 	FromDate     string   `json:"fromDate"`
 	ToDate       string   `json:"toDate"`
@@ -89,8 +90,7 @@ func create(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 		return clientError(http.StatusUnprocessableEntity, "Invalid object format")
 	}
 
-	// TODO Generate UUID booking ID
-	if !uuidRegexp.MatchString(bk.BookingId) {
+	if !IsValidUUID(bk.Id) {
 		return clientError(http.StatusBadRequest, "Invalid booking ID")
 	}
 	if bk.GuestDetails == "" {
@@ -129,9 +129,6 @@ func update(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	}
 
 	// Validation
-	if !uuidRegexp.MatchString(bk.BookingId) {
-		return clientError(http.StatusBadRequest, "Invalid booking ID")
-	}
 	if bk.GuestDetails == "" {
 		return clientError(http.StatusBadRequest, "Guest Details cannot be empty")
 	}
@@ -172,6 +169,11 @@ func clientError(status int, detail string) (events.APIGatewayProxyResponse, err
 		StatusCode: status,
 		Body:       http.StatusText(status) + ": " + detail,
 	}, nil
+}
+
+func IsValidUUID(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
 }
 
 func main() {
