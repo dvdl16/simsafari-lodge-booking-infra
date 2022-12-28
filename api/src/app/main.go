@@ -6,14 +6,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/google/uuid"
 )
 
-var uuidRegexp = regexp.MustCompile(`^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$`)
 var errorLogger = log.New(os.Stderr, "ERROR ", log.Llongfile)
 var debugLogger = log.New(os.Stderr, "DEBUG ", log.Llongfile)
 
@@ -30,8 +28,6 @@ type booking struct {
 
 // Do a switch on the HTTP request method to determine which action to take.
 func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	// debugLogger.Println("Request Authorization Headers:")
-	// debugLogger.Println(req.Headers["Authorization"])
 	switch req.HTTPMethod {
 	case "GET":
 		return show(req)
