@@ -51,7 +51,8 @@ resource "aws_iam_policy" "iam_dynamodb_privilege_policy" {
           "dynamodb:PutItem",
           "dynamodb:GetItem",
           "dynamodb:Scan",
-          "dynamodb:UpdateItem"
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem"
         ],
         "Resource" : "*",
         "Effect" : "Allow"

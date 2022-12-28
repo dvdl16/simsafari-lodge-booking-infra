@@ -37,6 +37,8 @@ func router(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 		return create(req)
 	case "PUT":
 		return update(req)
+	case "DELETE":
+		return deleteResource(req)
 	default:
 		return clientError(http.StatusMethodNotAllowed, "Only GET and POST allowed")
 	}
@@ -189,6 +191,26 @@ func update(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, 
 	}, nil
 
 }
+
+func deleteResource(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	bookingId := req.QueryStringParameters["id"]
+	if bookingId == "" {
+		return clientError(http.StatusBadRequest, "Expected an 'id' parameter")
+	}
+
+	err := deleteBooking(bookingId)
+	if err != nil {
+		return serverError(err)
+	}
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin":      "*",
+			"Access-Control-Allow-Methods":     "GET,POST,PUT,DELETE,OPTIONS",
+			"Access-Control-Allow-Headers":     "X-Amz-Date,X-Api-Key,X-Amz-Security-Token,X-Requested-With,X-Auth-Token,Referer,User-Agent,Origin,Content-Type,Authorization,Accept,Access-Control-Allow-Methods,Access-Control-Allow-Origin,Access-Control-Allow-Headers",
+			"Access-Control-Allow-Credentials": "'true'",
+		},
 	}, nil
 
 }

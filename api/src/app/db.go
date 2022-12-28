@@ -143,3 +143,18 @@ func updateBooking(bk *booking) error {
 	_, err := db.UpdateItem(input)
 	return err
 }
+
+// Delete a booking record in DynamoDB.
+func deleteBooking(id string) error {
+	input := &dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+		},
+		TableName: aws.String("tf-bookings-table"),
+	}
+
+	_, err := db.DeleteItem(input)
+	return err
+}
