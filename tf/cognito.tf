@@ -31,6 +31,7 @@ resource "aws_cognito_user_pool_client" "userpool_client" {
   allowed_oauth_flows                  = ["code", "implicit"]
   allowed_oauth_scopes                 = ["email", "openid", "phone", "profile"]
   supported_identity_providers         = ["COGNITO", aws_cognito_identity_provider.google_provider.provider_name]
+  id_token_validity                    = 24
 }
 
 resource "aws_cognito_user_pool_domain" "main" {
