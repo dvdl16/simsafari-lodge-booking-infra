@@ -38,6 +38,16 @@ resource "aws_cognito_user_pool_domain" "main" {
   user_pool_id = aws_cognito_user_pool.lambda_user_pool.id
 }
 
+resource "aws_cognito_user_pool_ui_customization" "custom_ui" {
+  client_id = aws_cognito_user_pool_client.userpool_client.id
+
+  image_file = filebase64("assets/bookings-logo-min.png")
+
+  # Refer to the aws_cognito_user_pool_domain resource's
+  # user_pool_id attribute to ensure it is in an 'Active' state
+  user_pool_id = aws_cognito_user_pool_domain.main.user_pool_id
+}
+
 resource "aws_cognito_identity_provider" "google_provider" {
   user_pool_id  = aws_cognito_user_pool.lambda_user_pool.id
   provider_name = "Google"
