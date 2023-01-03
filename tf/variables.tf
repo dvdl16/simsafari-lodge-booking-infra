@@ -36,3 +36,33 @@ variable "google_client_secret" {
 variable "common_tags" {
   description = "Common tags to be applied to all components."
 }
+
+variable "payfast_confirmation_address" {
+  type        = string
+  description = "The email address to send the confirmation email to"
+}
+
+variable "payfast_email_confirmation" {
+  type        = string
+  description = "Whether to send an email confirmation to the merchant of the transaction. The email confirmation is automatically sent to the payer. 1 = on, 0 = off"
+}
+
+variable "payfast_merchant_id" {
+  type        = string
+  description = "The Merchant ID as given by the PayFast system. Used to uniquely identify the receiving account. This can be found on the merchant’s settings page."
+}
+
+variable "payfast_merchant_key" {
+  type        = string
+  description = "The Merchant Key as given by the PayFast system. Used to uniquely identify the receiving account"
+}
+
+variable "payfast_onsite_url" {
+  type        = string
+  description = "URL for Payfast Onsite Payments (Beta)"
+}
+
+variable "payfast_passphrase" {
+  type        = string
+  description = "Passphrase for Payfast account"
+}

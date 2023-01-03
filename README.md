@@ -16,14 +16,23 @@ aws_account_id   = "1234567"
 domain_name = "example.com"
 bucket_name = "example.com"
 
-google_client_id = "12345abcd.apps.googleusercontent.com"
-google_client_secret = "ABCDEFG"
+google_client_id      = "12345abcd.apps.googleusercontent.com"
+google_client_secret  = "ABCDEFG"
+
+payfast_merchant_id          = "10004002"
+payfast_merchant_key         = "q1cd2rdny4a53"
+payfast_onsite_url           = "https://sandbox.payfast.co.za/onsite/process"
+payfast_passphrase           = "payfast"
+payfast_confirmation_address = "1"
+payfast_email_confirmation   = "webmaster@example.com"
 
 common_tags = {
   Project = "my-project"
 }
 
 ```
+
+> Make sure that `payments.zip` exists in the root directory (see [this repo](https://github.com/dvdl16/simsafari-lodge-booking-payment-lambda))
 
 
 To deploying the infrastructure, use the following terraform commands:
