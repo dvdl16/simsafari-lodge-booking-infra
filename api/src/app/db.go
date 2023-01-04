@@ -16,7 +16,7 @@ var db = dynamodb.New(session.New(), aws.NewConfig().WithRegion("eu-west-1"))
 
 func getBookings(minFromDate string) (*[]booking, error) {
 	// Prepare the input for the query.
-	filt := expression.Name("fromDate").GreaterThan(expression.Value(minFromDate))
+	filt := expression.Name("toDate").GreaterThanEqual(expression.Value(minFromDate))
 	proj := expression.NamesList(
 		expression.Name("id"),
 		expression.Name("userId"),
