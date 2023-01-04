@@ -42,11 +42,11 @@ resource "aws_api_gateway_method_response" "options_200" {
 }
 
 resource "aws_api_gateway_integration" "options_integration" {
-  rest_api_id = aws_api_gateway_rest_api.tf_bookings_store.id
-  resource_id = aws_api_gateway_resource.bookings.id
-  http_method = aws_api_gateway_method.options_method.http_method
-  type        = "MOCK"
-  depends_on  = [aws_api_gateway_method.options_method]
+  rest_api_id          = aws_api_gateway_rest_api.tf_bookings_store.id
+  resource_id          = aws_api_gateway_resource.bookings.id
+  http_method          = aws_api_gateway_method.options_method.http_method
+  type                 = "MOCK"
+  depends_on           = [aws_api_gateway_method.options_method]
   passthrough_behavior = "WHEN_NO_MATCH"
   request_templates = {
     "application/json" = <<EOF
@@ -101,11 +101,11 @@ resource "aws_api_gateway_method_response" "options_payment_200" {
 }
 
 resource "aws_api_gateway_integration" "options_payment_integration" {
-  rest_api_id = aws_api_gateway_rest_api.tf_bookings_store.id
-  resource_id = aws_api_gateway_resource.payments.id
-  http_method = aws_api_gateway_method.options_payments_method.http_method
-  type        = "MOCK"
-  depends_on  = [aws_api_gateway_method.options_payments_method]
+  rest_api_id          = aws_api_gateway_rest_api.tf_bookings_store.id
+  resource_id          = aws_api_gateway_resource.payments.id
+  http_method          = aws_api_gateway_method.options_payments_method.http_method
+  type                 = "MOCK"
+  depends_on           = [aws_api_gateway_method.options_payments_method]
   passthrough_behavior = "WHEN_NO_MATCH"
   request_templates = {
     "application/json" = <<EOF
