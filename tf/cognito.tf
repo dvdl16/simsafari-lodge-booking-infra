@@ -20,6 +20,10 @@ resource "aws_cognito_user_pool" "lambda_user_pool" {
     }
   }
 
+  lambda_config {
+    post_authentication = "arn:aws:lambda:${var.aws_region}:${var.aws_account_id}:function:${aws_lambda_function.terraform_login_notification_lambda_func.id}"
+  }
+
   auto_verified_attributes = ["email"]
 
   tags = var.common_tags

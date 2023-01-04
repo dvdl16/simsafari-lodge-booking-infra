@@ -66,3 +66,13 @@ variable "payfast_passphrase" {
   type        = string
   description = "Passphrase for Payfast account"
 }
+
+variable "telegram_bot_token" {
+  type        = string
+  description = "Telegram Bot Token for Login Notification messages"
+}
+
+variable "telegram_chat_id" {
+  type        = string
+  description = "Telegram Chat ID for Login Notification messages"
+}

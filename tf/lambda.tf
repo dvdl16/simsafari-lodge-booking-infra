@@ -36,6 +36,24 @@ resource "aws_iam_role" "iam_for_payment_lambda" {
   })
 }
 
+resource "aws_iam_role" "iam_for_login_notification_lambda" {
+  name = "iam_for_login_notification_lambda"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
 # Policies
 resource "aws_iam_policy" "iam_policy_for_lambda" {
   name        = "aws_iam_policy_for_terraform_aws_lambda_role"
@@ -99,6 +117,28 @@ resource "aws_iam_policy" "iam_policy_for_payment_lambda" {
   })
 }
 
+resource "aws_iam_policy" "iam_cognito_lambda_invocation_policy" {
+  name        = "aws_iam_cognito_lambda_invocation_policy"
+  path        = "/"
+  description = "Grants Amazon Cognito a limited ability to invoke a Lambda function"
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Id" : "default",
+      "Statement" : [
+        {
+          "Action" : [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource" : "arn:aws:logs:*:*:*",
+          "Effect" : "Allow"
+        }
+      ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "attach_iam_dynamodb_privilege_policy_to_iam_role" {
   role       = aws_iam_role.iam_for_lambda.name
   policy_arn = aws_iam_policy.iam_dynamodb_privilege_policy.arn
@@ -112,6 +152,11 @@ resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
 resource "aws_iam_role_policy_attachment" "attach_iam_payment_lambda_policy_to_iam_role" {
   role       = aws_iam_role.iam_for_payment_lambda.name
   policy_arn = aws_iam_policy.iam_policy_for_payment_lambda.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_iam_login_notification_lambda_policy_to_iam_role" {
+  role       = aws_iam_role.iam_for_login_notification_lambda.name
+  policy_arn = aws_iam_policy.iam_cognito_lambda_invocation_policy.arn
 }
 
 # Data
@@ -154,6 +199,23 @@ resource "aws_lambda_function" "terraform_payment_lambda_func" {
   }
 }
 
+# Lambda Function for Login Notifications and Logging
+resource "aws_lambda_function" "terraform_login_notification_lambda_func" {
+  filename         = "${path.module}/../login_notifications/lambda_function.zip"
+  source_code_hash = filebase64sha256("${path.module}/../login_notifications/lambda_function.zip")
+  function_name    = "SimSafari_Lodge_Booking_Login_Notification"
+  role             = aws_iam_role.iam_for_login_notification_lambda.arn
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.9"
+
+  environment {
+    variables = {
+      "APP_TELEGRAM_BOT_TOKEN" = var.telegram_bot_token
+      "APP_TELEGRAM_CHAT_ID"   = var.telegram_chat_id
+    }
+  }
+}
+
 resource "aws_lambda_function_url" "terraform_lambda_func_url_latest" {
   function_name      = aws_lambda_function.terraform_lambda_func.function_name
   authorization_type = "NONE"
@@ -177,4 +239,13 @@ resource "aws_lambda_permission" "tf_payments_lambda" {
 
   # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
   source_arn = "arn:aws:execute-api:${var.aws_region}:${var.aws_account_id}:${aws_api_gateway_rest_api.tf_bookings_store.id}/*/${aws_api_gateway_method.payments_method.http_method}${aws_api_gateway_resource.payments.path}"
+}
+
+resource "aws_lambda_permission" "tf_login_notification_lambda" {
+  statement_id  = "CSI_PostAuthentication"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_login_notification_lambda_func.function_name
+  principal     = "cognito-idp.amazonaws.com"
+
+  source_arn = "arn:aws:cognito-idp:${var.aws_region}:${var.aws_account_id}:userpool/${aws_cognito_user_pool.lambda_user_pool.id}"
 }

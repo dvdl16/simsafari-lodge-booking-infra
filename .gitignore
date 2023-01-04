@@ -61,3 +61,6 @@ terraform.rc
 
 # Compiled binaries
 main
+
+# Python venv
+**/venv/
