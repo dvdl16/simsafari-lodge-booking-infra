@@ -12,3 +12,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: "python"
+    directory: "/login_notifications"
+    schedule:
+      interval: "weekly"
