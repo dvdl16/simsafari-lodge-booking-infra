@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -68,7 +69,7 @@ jobs:
         zip -r ../../../../payments.zip .
         cd ../../../../
         zip -g payments.zip *.py
-        mv payment-lambda/payments.zip .
+        mv payments.zip ../.
     
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v2
