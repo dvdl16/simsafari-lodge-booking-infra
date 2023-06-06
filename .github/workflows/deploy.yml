@@ -95,6 +95,6 @@ jobs:
         TF_VAR_common_tags: '{"Project":"${{ secrets.PROJECT }}"}'
       run: |
         cd tf
-        terraform init -backend-config="access_key=$TF_VAR_aws_access_key" -backend-config="secret_key=$TF_VAR_aws_secret_key"
+        terraform init -backend-config="access_key=TEST123" -backend-config="secret_key=$TF_VAR_aws_secret_key"
         terraform plan
         terraform apply -auto-approve
