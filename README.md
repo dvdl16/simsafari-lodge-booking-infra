@@ -9,7 +9,8 @@ This repository contains source code for managing the infrastructure and backend
 ### Deploying the infrastructure
 Make sure to have a `.tfvars` file or to supply the following terraform variables:
 ```bash
-aws_profile_name = "kdefault"
+aws_access_key = "ABCDEFG"
+aws_secret_key = "ABCDEFG"
 aws_region       = "eu-west-1"
 aws_account_id   = "1234567"
 
@@ -23,8 +24,8 @@ payfast_merchant_id          = "10004002"
 payfast_merchant_key         = "q1cd2rdny4a53"
 payfast_onsite_url           = "https://sandbox.payfast.co.za/onsite/process"
 payfast_passphrase           = "payfast"
-payfast_confirmation_address = "1"
-payfast_email_confirmation   = "webmaster@example.com"
+payfast_confirmation_address = "webmaster@example.com"
+payfast_email_confirmation   = "1"
 
 common_tags = {
   Project = "my-project"
@@ -46,8 +47,6 @@ AWS_PROFILE=jabulani terraform init
 terraform plan -var-file="terraform.tfvars"
 terraform apply -var-file="terraform.tfvars"
 ```
-
-*Note that terraform expects a AWS CLI profile named `jabulani`.
 
 ### Building the Go backend locally
 
