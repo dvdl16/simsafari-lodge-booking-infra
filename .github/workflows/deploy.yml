@@ -1,0 +1,97 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout simsafari-lodge-booking-infra
+      uses: actions/checkout@v3
+      with:
+        repository: "dvdl16/simsafari-lodge-booking-infra"
+        
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.17'      
+
+    - name: Build the Go backend
+      working-directory: ./api
+      run: |
+        env GOOS=linux GOARCH=amd64 go build -o ./main  src/app/*.go
+        zip -j main.zip main
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install python dependencies for Login Notification Lambda
+      working-directory: ./login_notifications
+      run: |
+        python -m venv venv-notification-lambda
+        source venv-notification-lambda/bin/activate
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Zip the Login Notification lambda
+      working-directory: ./login_notifications
+      run: |
+        cd venv-notification-lambda/lib/python3.8/site-packages/
+        zip -r ../../../../lambda_function.zip .
+        cd ../../../../
+        zip -g lambda_function.zip *.py
+
+    - name: Checkout simsafari-lodge-booking-payment-lambda
+      uses: actions/checkout@v3
+      with:
+        repository: "dvdl16/simsafari-lodge-booking-payment-lambda"
+        path: 'payment-lambda'
+
+    - name: Install dependencies for Payment Lambda
+      working-directory: ./payment-lambda
+      run: |
+        python -m venv venv-payment-lambda
+        source venv-payment-lambda/bin/activate
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Zip the Payment lambda
+      run: |
+        cd payment-lambda/venv-payment-lambda/lib/python3.8/site-packages/
+        zip -r ../../../../payments.zip .
+        cd ../../../../
+        zip -g payments.zip *.py
+        mv payment-lambda/payments.zip .
+    
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      
+    - name: Terraform Init and Apply
+      env:
+        TF_VAR_aws_access_key: ${{ secrets.AWS_ACCES_KEY }}
+        TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+        TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+        TF_VAR_aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+        TF_VAR_domain_name: ${{ secrets.DOMAIN_NAME }}
+        TF_VAR_bucket_name: ${{ secrets.BUCKET_NAME }}
+        TF_VAR_google_client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
+        TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        TF_VAR_payfast_merchant_id: ${{ secrets.PAYFAST_MERCHANT_ID }}
+        TF_VAR_payfast_merchant_key: ${{ secrets.PAYFAST_MERCHANT_KEY }}
+        TF_VAR_payfast_onsite_url: ${{ vars.PAYFAST_ONSITE_URL }}
+        TF_VAR_payfast_passphrase: ${{ secrets.PAYFAST_PASSPHRASE }}
+        TF_VAR_payfast_confirmation_address: ${{ secrets.PAYFAST_CONFIRMATION_ADDRESS }}
+        TF_VAR_payfast_email_confirmation: ${{ secrets.PAYFAST_EMAIL_CONFIRMATION }}
+        TF_VAR_common_tags: '{"Project":"${{ secrets.PROJECT }}"}'
+      run: |
+        cd tf
+        terraform init
+        terraform plan
+        terraform apply -auto-approve

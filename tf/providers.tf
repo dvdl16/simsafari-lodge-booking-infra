@@ -17,6 +17,7 @@ terraform {
 
 provider "aws" {
   alias   = "acm_provider"
-  profile = var.aws_profile_name
   region  = "us-east-1"
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
 }

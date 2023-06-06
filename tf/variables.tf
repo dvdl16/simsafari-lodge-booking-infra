@@ -1,16 +1,21 @@
-variable "aws_profile_name" {
+variable "aws_access_key" {
   type        = string
-  description = "The named AWS CLI profile to use"
+  description = "The AWS Access Key to use"
+}
+
+variable "aws_secret_key" {
+  type        = string
+  description = "The AWS Secret Key to use"
 }
 
 variable "aws_region" {
   type        = string
-  description = "The AWS region. Should match up with the region defined in the named CLI profile supplied in 'aws_profile_name'"
+  description = "The AWS region."
 }
 
 variable "aws_account_id" {
   type        = string
-  description = "The AWS account ID. Should match up with the account ID defined in the named CLI profile supplied in 'aws_profile_name'"
+  description = "The AWS account ID."
 }
 
 variable "domain_name" {
