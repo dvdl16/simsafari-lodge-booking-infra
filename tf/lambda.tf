@@ -184,7 +184,7 @@ resource "aws_lambda_function" "terraform_payment_lambda_func" {
   function_name    = "SimSafari_Lodge_Booking_Payment_API"
   role             = aws_iam_role.iam_for_payment_lambda.arn
   handler          = "lambda_function.lambda_handler"
-  runtime          = "python3.9"
+  runtime          = "python3.10"
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_payment_lambda_policy_to_iam_role]
 
   environment {
@@ -206,7 +206,7 @@ resource "aws_lambda_function" "terraform_login_notification_lambda_func" {
   function_name    = "SimSafari_Lodge_Booking_Login_Notification"
   role             = aws_iam_role.iam_for_login_notification_lambda.arn
   handler          = "lambda_function.lambda_handler"
-  runtime          = "python3.9"
+  runtime          = "python3.10"
 
   environment {
     variables = {
