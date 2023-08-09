@@ -16,6 +16,5 @@ terraform {
 }
 
 provider "aws" {
-  alias   = "acm_provider"
-  region  = "us-east-1"
+  region  = "eu-west-1"
 }

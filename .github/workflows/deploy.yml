@@ -94,7 +94,6 @@ jobs:
         TF_VAR_telegram_bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TF_VAR_telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
         TF_VAR_project_name: ${{ secrets.PROJECT }}
-        TF_LOG: TRACE
       run: |
         cd tf
         terraform init
