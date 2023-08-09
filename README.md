@@ -9,8 +9,6 @@ This repository contains source code for managing the infrastructure and backend
 ### Deploying the infrastructure
 Make sure to have a `.tfvars` file or to supply the following terraform variables:
 ```bash
-aws_access_key = "ABCDEFG"
-aws_secret_key = "ABCDEFG"
 aws_region       = "eu-west-1"
 aws_account_id   = "1234567"
 
@@ -42,6 +40,8 @@ cd tf
 AWS_PROFILE=jabulani terraform init
 
 # Run to deploy from your workstation
+export AWS_ACCESS_KEY_ID=xxx
+export AWS_SECRET_ACCESS_KEY=xxx 
 terraform plan -var-file="terraform.tfvars"
 terraform apply -var-file="terraform.tfvars"
 ```
