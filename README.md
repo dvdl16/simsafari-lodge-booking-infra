@@ -27,9 +27,7 @@ payfast_passphrase           = "payfast"
 payfast_confirmation_address = "webmaster@example.com"
 payfast_email_confirmation   = "1"
 
-common_tags = {
-  Project = "my-project"
-}
+project_name = "my-project"
 
 ```
 

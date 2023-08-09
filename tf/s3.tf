@@ -2,7 +2,9 @@
 resource "aws_s3_bucket" "www_bucket" {
   bucket = "www.${var.bucket_name}"
 
-  tags = var.common_tags
+  tags = {
+    "Project" = var.project_name
+  }
 }
 
 resource "aws_s3_bucket_website_configuration" "www_bucket" {
@@ -42,7 +44,9 @@ resource "aws_s3_bucket_cors_configuration" "www_bucket" {
 resource "aws_s3_bucket" "root_bucket" {
   bucket = var.bucket_name
 
-  tags = var.common_tags
+  tags = {
+    "Project" = var.project_name
+  }
 }
 
 resource "aws_s3_bucket_acl" "root_bucket_acl" {

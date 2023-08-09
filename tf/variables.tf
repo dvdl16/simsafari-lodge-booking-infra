@@ -38,8 +38,8 @@ variable "google_client_secret" {
   description = "A Google OAuth Client ID, used for authentication with Cognito."
 }
 
-variable "common_tags" {
-  description = "Common tags to be applied to all components."
+variable "project_name" {
+  description = "Name of this Project, will be used in common tags."
 }
 
 variable "payfast_confirmation_address" {

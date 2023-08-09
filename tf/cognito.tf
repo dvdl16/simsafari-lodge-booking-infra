@@ -26,7 +26,9 @@ resource "aws_cognito_user_pool" "lambda_user_pool" {
 
   auto_verified_attributes = ["email"]
 
-  tags = var.common_tags
+  tags = {
+    "Project" = var.project_name
+  }
 }
 
 resource "aws_cognito_user_pool_client" "userpool_client" {
