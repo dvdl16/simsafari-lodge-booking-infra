@@ -68,7 +68,7 @@ aws lambda update-function-code --function-name SimSafari_Lodge_Booking_API --zi
 
 ### Building the Login Notification lambda code locally
 ```bash
-cd venv/lib/python3.10/site-packages/
+cd venv/lib/python3.9/site-packages/
 zip -r ../../../../lambda_function.zip .
 cd ../../../../
 zip -g lambda_function.zip *.py
