@@ -91,6 +91,7 @@ jobs:
         TF_VAR_payfast_confirmation_address: ${{ secrets.PAYFAST_CONFIRMATION_ADDRESS }}
         TF_VAR_payfast_email_confirmation: ${{ secrets.PAYFAST_EMAIL_CONFIRMATION }}
         TF_VAR_common_tags: '{"Project":"${{ secrets.PROJECT }}"}'
+        TF_LOG: TRACE
       run: |
         cd tf
         terraform init -backend-config="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -backend-config="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
