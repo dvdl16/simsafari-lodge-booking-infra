@@ -90,6 +90,8 @@ jobs:
         TF_VAR_payfast_passphrase: ${{ secrets.PAYFAST_PASSPHRASE }}
         TF_VAR_payfast_confirmation_address: ${{ secrets.PAYFAST_CONFIRMATION_ADDRESS }}
         TF_VAR_payfast_email_confirmation: ${{ secrets.PAYFAST_EMAIL_CONFIRMATION }}
+        TF_VAR_telegram_bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TF_VAR_telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
         TF_VAR_common_tags: '{"Project":"${{ secrets.PROJECT }}"}'
         TF_LOG: TRACE
       run: |
