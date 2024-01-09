@@ -71,3 +71,8 @@ variable "telegram_chat_id" {
   type        = string
   description = "Telegram Chat ID for Login Notification messages"
 }
+
+variable "mx_record_value" {
+  type        = string
+  description = "An MX Record value."
+}

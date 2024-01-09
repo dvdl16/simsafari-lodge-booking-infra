@@ -28,3 +28,15 @@ resource "aws_route53_record" "www-a" {
     evaluate_target_health = false
   }
 }
+
+resource "aws_route53_record" "mx" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = ""
+  type    = "MX"
+
+  records = [
+    "${var.mx_record_value}",
+  ]
+
+  ttl = "600"
+}
