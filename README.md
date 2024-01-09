@@ -74,6 +74,13 @@ cd ../../../../
 zip -g lambda_function.zip *.py
 ```
 
+### Upgrading terraform or terraform providers
+After modifying `providers.tf` and `deploy.yml`, run:
+
+```shell
+AWS_PROFILE=jabulani terraform init -upgrade
+```
+
 ### Other Notes
 
 `go mod tidy` was used. It ensures that the go.mod file matches the source code in the module. It adds any missing module requirements necessary to build the current module’s packages and dependencies, and it removes requirements on modules that don’t provide any relevant packages. It also adds any missing entries to go.sum and removes unnecessary entries (credit to [S.D.](https://stackoverflow.com/a/68001204))
