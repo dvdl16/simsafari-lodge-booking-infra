@@ -40,3 +40,47 @@ resource "aws_route53_record" "mx" {
 
   ttl = "600"
 }
+
+resource "aws_route53_record" "mail" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "www.${var.domain_name}"
+  type    = "A"
+  ttl     = 600
+
+  records = [
+    "${var.a_record_mail_value}",
+  ]
+}
+
+resource "aws_route53_record" "srv" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "_autodiscover._tcp.${var.domain_name}"
+  type    = "SRV"
+  ttl     = 600
+
+  records = [
+    "${var.srv_record_value}",
+  ]
+}
+
+resource "aws_route53_record" "dkim" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = "default._domainkey.${var.domain_name}"
+  type    = "TXT"
+  ttl     = 600
+
+  records = [
+    "${var.dkim_record_value}",
+  ]
+}
+
+resource "aws_route53_record" "spf" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = ""
+  type    = "TXT"
+  ttl     = 600
+
+  records = [
+    "${var.spf_record_value}",
+  ]
+}

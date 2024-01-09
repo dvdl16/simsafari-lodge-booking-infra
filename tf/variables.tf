@@ -76,3 +76,23 @@ variable "mx_record_value" {
   type        = string
   description = "An MX Record value."
 }
+
+variable "a_record_mail_value" {
+  type        = string
+  description = "Value for the mail A record."
+}
+
+variable "srv_record_value" {
+  type        = string
+  description = "Value for the mail SRV record."
+}
+
+variable "dkim_record_value" {
+  type        = string
+  description = "Value for the mail DKIM record."
+}
+
+variable "spf_record_value" {
+  type        = string
+  description = "Value for the mail SPF record."
+}

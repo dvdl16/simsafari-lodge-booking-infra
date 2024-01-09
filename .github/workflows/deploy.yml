@@ -98,6 +98,10 @@ jobs:
         TF_VAR_telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
         TF_VAR_project_name: ${{ secrets.PROJECT }}
         TF_VAR_mx_record_value: ${{ vars.MX_RECORD_VALUE }}
+        TF_VAR_a_record_mail_value: ${{ vars.A_RECORD_MAIL_VALUE }}
+        TF_VAR_srv_record_value: ${{ vars.SRV_RECORD_VALUE }}
+        TF_VAR_dkim_record_value: ${{ secrets.DKIM_RECORD_VALUE }}
+        TF_VAR_spf_record_value: ${{ vars.SPF_RECORD_MAIL_VALUE }}
       run: |
         cd tf
         terraform init
