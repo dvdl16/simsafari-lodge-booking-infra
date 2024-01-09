@@ -84,3 +84,54 @@ AWS_PROFILE=jabulani terraform init -upgrade
 ### Other Notes
 
 `go mod tidy` was used. It ensures that the go.mod file matches the source code in the module. It adds any missing module requirements necessary to build the current module’s packages and dependencies, and it removes requirements on modules that don’t provide any relevant packages. It also adds any missing entries to go.sum and removes unnecessary entries (credit to [S.D.](https://stackoverflow.com/a/68001204))
+
+### Pipeline Variables and Secrets
+
+The following Github Actions Variables are used:
+```shell
+# Required for Terraform
+AWS_REGION
+
+# Payfast setup to accept payments
+PAYFAST_ONSITE_URL
+
+# Required to have working email
+A_RECORD_MAIL_VALUE
+MX_RECORD_VALUE
+SPF_RECORD_MAIL_VALUE
+SRV_RECORD_VALUE
+```
+
+The following Github Actions Secrets are used:
+
+```shell
+# Required for Terraform
+AWS_ACCOUNT_ID                  # AWS Account ID
+AWS_ACCESS_KEY_ID               # AWS Access Key ID
+AWS_SECRET_ACCESS_KEY           # AWS Access Key Secret
+BUCKET_NAME                     # S3 Bucket name for Static files hosting
+DOMAIN_NAME                     # e.g. mysite.com
+GOOGLE_CLIENT_ID                # Used for Cognito (SSO with Google)
+GOOGLE_CLIENT_SECRET            # Used for Cognito (SSO with Google)
+PROJECT                         # Used as a resource tag
+
+# Login Notifications
+TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID
+
+# Dependabot monitoring
+UPTIME_KUMA_URL
+
+# Payfast setup to accept payments
+PAYFAST_CONFIRMATION_ADDRESS
+PAYFAST_EMAIL_CONFIRMATION
+PAYFAST_MERCHANT_ID
+PAYFAST_MERCHANT_KEY
+PAYFAST_PASSPHRASE
+
+# Required to have working email
+DKIM_RECORD_VALUE           # Note that TXT records have a max of 255 characters
+                            # It may be necessary to split the value up
+                            # e.g. VERY-LONG-DKIM-STRING becomes VERY-LONG-D" "KIM-STRING
+                            # Note the peculiar quotation marks (AWS Route53 automatically adds outer quotation marks)
+```
