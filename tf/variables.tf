@@ -82,11 +82,6 @@ variable "a_record_mail_value" {
   description = "Value for the mail A record."
 }
 
-variable "srv_record_value" {
-  type        = string
-  description = "Value for the mail SRV record."
-}
-
 variable "dkim_record_value" {
   type        = string
   description = "Value for the mail DKIM record."

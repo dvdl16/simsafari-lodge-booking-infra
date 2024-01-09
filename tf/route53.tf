@@ -52,17 +52,6 @@ resource "aws_route53_record" "mail" {
   ]
 }
 
-resource "aws_route53_record" "srv" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "_autodiscover._tcp.${var.domain_name}"
-  type    = "SRV"
-  ttl     = 600
-
-  records = [
-    "${var.srv_record_value}",
-  ]
-}
-
 resource "aws_route53_record" "dkim" {
   zone_id = aws_route53_zone.main.zone_id
   name    = "default._domainkey.${var.domain_name}"
