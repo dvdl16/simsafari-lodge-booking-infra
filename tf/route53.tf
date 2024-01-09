@@ -43,7 +43,7 @@ resource "aws_route53_record" "mx" {
 
 resource "aws_route53_record" "mail" {
   zone_id = aws_route53_zone.main.zone_id
-  name    = "www.${var.domain_name}"
+  name    = "mail.${var.domain_name}"
   type    = "A"
   ttl     = 600
 
