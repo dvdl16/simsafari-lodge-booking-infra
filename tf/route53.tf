@@ -73,15 +73,3 @@ resource "aws_route53_record" "spf" {
     "${var.spf_record_value}",
   ]
 }
-
-resource "aws_route53_record" "cname" {
-  zone_id = aws_route53_zone.main.zone_id
-  name    = "status"
-  type    = "CNAME"
-
-  records = [
-    "${var.cname_record_value}",
-  ]
-
-  ttl = "600"
-}

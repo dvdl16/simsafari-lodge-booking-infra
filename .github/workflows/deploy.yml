@@ -101,7 +101,6 @@ jobs:
         TF_VAR_a_record_mail_value: ${{ vars.A_RECORD_MAIL_VALUE }}
         TF_VAR_dkim_record_value: ${{ secrets.DKIM_RECORD_VALUE }}
         TF_VAR_spf_record_value: ${{ vars.SPF_RECORD_MAIL_VALUE }}
-        TF_VAR_cname_record_value: ${{ secrets.CNAME_RECORD_VALUE }}
       run: |
         cd tf
         terraform init

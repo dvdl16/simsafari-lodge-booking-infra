@@ -91,8 +91,3 @@ variable "spf_record_value" {
   type        = string
   description = "Value for the mail SPF record."
 }
-
-variable "cname_record_value" {
-  type        = string
-  description = "Value for the status.x.x CNAME record."
-}
