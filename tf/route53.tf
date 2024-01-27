@@ -76,7 +76,7 @@ resource "aws_route53_record" "spf" {
 
 resource "aws_route53_record" "cname" {
   zone_id = aws_route53_zone.main.zone_id
-  name    = ""
+  name    = "status"
   type    = "CNAME"
 
   records = [
