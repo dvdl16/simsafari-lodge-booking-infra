@@ -73,3 +73,14 @@ resource "aws_route53_record" "spf" {
     "${var.spf_record_value}",
   ]
 }
+
+resource "aws_route53_record" "a" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "status"
+  type    = "A"
+  ttl     = 600
+
+  records = [
+    "${var.status_a_record_value}",
+  ]
+}

@@ -91,3 +91,8 @@ variable "spf_record_value" {
   type        = string
   description = "Value for the mail SPF record."
 }
+
+variable "status_a_record_value" {
+  type        = string
+  description = "Value for the status.x.x A record."
+}
