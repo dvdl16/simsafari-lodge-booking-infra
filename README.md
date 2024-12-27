@@ -135,3 +135,19 @@ DKIM_RECORD_VALUE           # Note that TXT records have a max of 255 characters
                             # e.g. VERY-LONG-DKIM-STRING becomes VERY-LONG-D" "KIM-STRING
                             # Note the peculiar quotation marks (AWS Route53 automatically adds outer quotation marks)
 ```
+
+### How to update Terraform
+
+Download and install the latest from https://developer.hashicorp.com/terraform/install
+
+Confirm with `terraform -version`
+
+Change the pinned versions in `tf/providers.tf`
+
+Run:
+```shell
+export AWS_ACCESS_KEY=ABCD
+export AWS_SECRET_KEY="1234abcd"
+
+terraform init -upgrade
+```
