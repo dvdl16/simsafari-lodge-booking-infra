@@ -14,12 +14,12 @@ jobs:
 
     steps:
     - name: Checkout simsafari-lodge-booking-infra
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: "dvdl16/simsafari-lodge-booking-infra"
         
     - name: Setup Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '1.21'      
 
@@ -51,7 +51,7 @@ jobs:
         zip -g lambda_function.zip *.py
 
     - name: Checkout simsafari-lodge-booking-payment-lambda
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: "dvdl16/simsafari-lodge-booking-payment-lambda"
         path: 'payment-lambda'
