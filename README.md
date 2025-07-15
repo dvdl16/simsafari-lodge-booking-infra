@@ -142,7 +142,9 @@ Download and install the latest from https://developer.hashicorp.com/terraform/i
 
 Confirm with `terraform -version`
 
-Change the pinned versions in `tf/providers.tf`
+Change the pinned versions of `terraform` and `aws provider` in `tf/providers.tf`. 
+
+Also change the pinned version in `.github/workflows/deploy.yml` step `Set up Terraform`
 
 Run:
 ```shell
