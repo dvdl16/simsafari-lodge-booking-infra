@@ -209,10 +209,32 @@ resource "aws_api_gateway_authorizer" "cognito_auth" {
 # Deployment
 resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.tf_bookings_store.id
-  stage_name  = "beta"
-  depends_on = [
-    aws_api_gateway_integration.bookings_lambda_integration,
-  aws_api_gateway_integration.payments_lambda_integration]
+
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.bookings.id,
+      aws_api_gateway_method.bookings_method.id,
+      aws_api_gateway_integration.bookings_lambda_integration.id,
+      aws_api_gateway_resource.payments.id,
+      aws_api_gateway_method.payments_method.id,
+      aws_api_gateway_integration.payments_lambda_integration.id,
+      aws_api_gateway_method.options_method.id,
+      aws_api_gateway_integration.options_integration.id,
+      aws_api_gateway_method.options_payments_method.id,
+      aws_api_gateway_integration.options_payment_integration.id,
+      aws_api_gateway_authorizer.cognito_auth.id
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "beta" {
+  deployment_id = aws_api_gateway_deployment.deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.tf_bookings_store.id
+  stage_name    = "beta"
 }
 
 resource "aws_iam_role" "invocation_role" {
