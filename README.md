@@ -96,8 +96,8 @@ AWS_REGION
 PAYFAST_ONSITE_URL
 
 # Required to have working email
-A_RECORD_MAIL_VALUE
-MX_RECORD_VALUE
+A_RECORD_MAIL_VALUE    # points to domain host server
+MX_RECORD_VALUE        # points to domain host server
 SPF_RECORD_MAIL_VALUE
 SRV_RECORD_VALUE
 ```
